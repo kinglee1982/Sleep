@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         closeWifi = findViewById(R.id.close_wifi);
         strongSign = findViewById(R.id.strong_sign);
         imei = findViewById(R.id.imei);
-        imei.setText("IMEI:  " + getIMEI(this));
+        imei.setText("IMEI:  " + PhoneControl.getInstance(MainActivity.this).getIMEI(this));
     }
 
     private void initData() {
@@ -70,8 +70,8 @@ public class MainActivity extends AppCompatActivity {
                     handler.sendMessageDelayed(handler.obtainMessage(), 1000);
                 } else {
                     Log.d("fdsafsad", "yes" + time);
-                    wakeUpAndUnlock();
-                    setScreenSleepTime(24 * 3600 * 1000, MainActivity.this);
+                    PhoneControl.getInstance(MainActivity.this).wakeUpAndUnlock();
+                    PhoneControl.getInstance(MainActivity.this).setScreenSleepTime(24 * 3600 * 1000, MainActivity.this);
                 }
             }
         };
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!set) {
                     set = true;
-                    setScreenSleepTime(5000, MainActivity.this);
+                    PhoneControl.getInstance(MainActivity.this).setScreenSleepTime(5000, MainActivity.this);
                     handler.sendMessageDelayed(handler.obtainMessage(), 1000);
                 }
             }
@@ -149,83 +149,6 @@ public class MainActivity extends AppCompatActivity {
                 WifiConnectUtils.getInstance(MainActivity.this).closeWifi();
             }
         });
-    }
-
-    /**
-     * 设置休眠时间
-     *
-     * @param millisecond
-     * @param context
-     */
-    public void setScreenSleepTime(int millisecond, Context context) {
-        try {
-            Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT,
-                    millisecond);
-        } catch (Exception localException) {
-            localException.printStackTrace();
-        }
-    }
-
-    /**
-     * 唤醒手机屏幕并解锁
-     */
-    public void wakeUpAndUnlock() {
-        PowerManager pm = (PowerManager) MainActivity.this
-                .getSystemService(Context.POWER_SERVICE);
-        @SuppressLint("InvalidWakeLockTag") PowerManager.WakeLock wl = pm.newWakeLock(
-                PowerManager.ACQUIRE_CAUSES_WAKEUP |
-                        PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "wakup");
-        wl.acquire(10000);
-        wl.release();
-
-        KeyguardManager keyguardManager = (KeyguardManager) MainActivity.this
-                .getSystemService(KEYGUARD_SERVICE);
-        KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("unLock");
-
-        keyguardLock.reenableKeyguard();
-        keyguardLock.disableKeyguard();
-    }
-
-    /**
-     * 判断当前屏幕是否亮
-     *
-     * @return
-     */
-    public boolean isScreenOn() {
-        PowerManager pm = (PowerManager) MainActivity.this
-                .getSystemService(Context.POWER_SERVICE);
-        boolean screenOn = pm.isScreenOn();
-
-        return screenOn;
-    }
-
-    /**
-     * 获取手机IMEI
-     *
-     * @param context
-     * @return
-     */
-    public final String getIMEI(Context context) {
-        try {
-            //实例化TelephonyManager对象
-            TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-            //获取IMEI号
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                String[] permissions = {Manifest.permission.READ_PHONE_STATE};
-                ActivityCompat.requestPermissions(this, permissions, 321);
-                return "";
-            }
-            String imei = telephonyManager.getDeviceId();
-            //在次做个验证，也不是什么时候都能获取到的啊
-            if (imei == null) {
-                imei = "";
-            }
-            return imei;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-
     }
 
     @SuppressWarnings("deprecation")
