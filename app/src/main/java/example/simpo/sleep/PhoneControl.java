@@ -13,6 +13,10 @@ import android.telephony.TelephonyManager;
 
 import static android.content.Context.KEYGUARD_SERVICE;
 
+/**
+ * 可以控制手机休眠并唤醒，并且获取IMEI
+ * **/
+
 public class PhoneControl {
 
     private static PhoneControl phoneControl;
