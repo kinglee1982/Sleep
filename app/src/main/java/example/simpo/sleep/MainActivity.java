@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler;
     private int time = 0;
     private boolean set = false;
-    private Button imei, connectWifi, openWifi, closeWifi, strongSign;
+    private Button imei, connectWifi, openWifi, closeWifi, strongSign,openGps, closeGps;
     private EditText wifiName, wifiPwd, wifiType;
     public TelephonyManager mTelephonyManager;
     public PhoneStatListener mListener;
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
         closeWifi = findViewById(R.id.close_wifi);
         strongSign = findViewById(R.id.strong_sign);
         imei = findViewById(R.id.imei);
+        openGps = findViewById(R.id.open_gps);
+        closeGps = findViewById(R.id.close_gps);
         imei.setText("IMEI:  " + PhoneControl.getInstance(MainActivity.this).getIMEI(this));
     }
 
@@ -147,6 +150,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 WifiConnectUtils.getInstance(MainActivity.this).closeWifi();
+            }
+        });
+        openGps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Location location = PhoneControl.getInstance(MainActivity.this).openGPS();
+                if (location != null) {
+                    closeGps.setText("当前位置 : " + location.getLatitude() + " : " + location.getLongitude());
+                }
             }
         });
     }
