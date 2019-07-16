@@ -1,5 +1,6 @@
 package example.simpo.sleep;
 
+//对应用做指定处理的实体类，这里用作黑屏和亮屏
 public class SleepBean {
 
     private String motionType;
