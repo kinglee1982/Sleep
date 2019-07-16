@@ -10,11 +10,11 @@ import java.util.List;
 
 
 /**
- * 用于定时开启系统黑屏和唤醒的工具类
+ * 用于定时开启系统黑屏和唤醒的工具类，只是简单的view覆盖，非系统休眠
  * 使用前需要让应用永不休眠，setContentView前添加
  * getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
  * Manifest中添加<uses-permission android:name="android.permission.WAKE_LOCK" />
- * **/
+ **/
 
 public class SleepControl {
 
@@ -23,6 +23,7 @@ public class SleepControl {
     private List<SleepBean> sleepBeans = new ArrayList<>();
     private List<OnSleepListener> sleepListeners = new ArrayList<>();
     private static boolean hasInit = false;
+    private static String correspondime = "";
 
     public static SleepControl getInstance() {
         if (sleepControl == null) {
@@ -42,6 +43,9 @@ public class SleepControl {
         init();
     }
 
+    /**
+     * 每隔一秒检查一次时间表和此时时间
+     **/
     private void init() {
         handler = new Handler() {
             @Override
@@ -55,6 +59,9 @@ public class SleepControl {
         hasInit = true;
     }
 
+    /**
+     * 向时间表中添加数据，并依次遍历时间表
+     **/
     public void add(SleepBean sleepBean) {
         if (sleepBean != null) {
             if (!sleepBeans.contains(sleepBean)) {
@@ -63,13 +70,20 @@ public class SleepControl {
         }
     }
 
+    /**
+     * 遍历时间表，对比此时时间是否被包含于时间表中，是，则启用回调
+     **/
     private void checkTime() {
         if (sleepBeans == null || sleepBeans.size() == 0) {
             return;
         }
         for (int i = 0; i < sleepBeans.size(); i++) {
-            Log.d("sleepBeans", getCurrentTime() + " : " + sleepBeans.get(i).getActiveTime());
             if (getCurrentTime().equals(sleepBeans.get(i).getActiveTime())) {
+                //避免一分钟内被重复调用60次
+                if (sleepBeans.get(i).getActiveTime().equals(correspondime) && sleepBeans.size() > 1) {
+                    return;
+                }
+                correspondime = sleepBeans.get(i).getActiveTime();
                 if (sleepListeners == null || sleepListeners.size() == 0) {
                     return;
                 }
@@ -80,6 +94,9 @@ public class SleepControl {
         }
     }
 
+    /**
+     * 获取此时的时间，小时/分钟
+     **/
     private String getCurrentTime() {
         Calendar calendar = Calendar.getInstance();
         String hour = calendar.get(Calendar.HOUR_OF_DAY) + "";
@@ -97,7 +114,13 @@ public class SleepControl {
         return hour + ":" + minute;
     }
 
+    /**
+     * 添加时间表的监听器，当满足睡眠或唤醒条件时，回调被调用
+     **/
     public void setOnSleepListener(OnSleepListener onSleepListener) {
+        if (onSleepListener == null) {
+            return;
+        }
         this.sleepListeners.add(onSleepListener);
     }
 

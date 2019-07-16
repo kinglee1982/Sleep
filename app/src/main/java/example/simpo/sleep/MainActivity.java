@@ -20,6 +20,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import example.simpo.sleep.netswitch.NetSignUtils;
 import example.simpo.sleep.netswitch.NetSwitchUtils;
 import example.simpo.sleep.netswitch.WifiConnectUtils;
@@ -29,11 +32,15 @@ public class MainActivity extends AppCompatActivity implements SleepControl.OnSl
     private Handler handler;
     private int time = 0;
     private boolean set = false;
-    private Button imei, connectWifi, openWifi, closeWifi, strongSign, openGps, closeGps;
+    private Button imei, connectWifi, openWifi, closeWifi, strongSign, openGps, closeGps, timeSleep, timeWakeUp;
     private EditText wifiName, wifiPwd, wifiType;
     public TelephonyManager mTelephonyManager;
     public PhoneStatListener mListener;
     private View mask;
+    private int i = 0;
+    private MyThread myThread;
+    private boolean isSleep = false;
+    private Object object = new Object();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements SleepControl.OnSl
         openGps = findViewById(R.id.open_gps);
         closeGps = findViewById(R.id.close_gps);
         mask = findViewById(R.id.mask);
+        timeSleep = findViewById(R.id.time_sleep);
+        timeWakeUp = findViewById(R.id.time_wakeup);
         imei.setText("IMEI:  " + PhoneControl.getInstance(MainActivity.this).getIMEI(this));
     }
 
@@ -106,9 +115,13 @@ public class MainActivity extends AppCompatActivity implements SleepControl.OnSl
         mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         //开始监听
         mListener = new PhoneStatListener();
-        //添加定时黑屏和亮屏数据，使用的前提是保证引应用永不休眠
-        SleepControl.getInstance().add(new SleepBean("sleep", "10:10"));
-        SleepControl.getInstance().add(new SleepBean("wake", "10:11"));
+        //添加定时黑屏和亮屏数据，使用的前提是保证应用永不休眠(主要是已经黑屏了我再黑屏你也看不见啊)
+        SleepControl.getInstance().add(new SleepBean("sleep", "14:10"));
+        SleepControl.getInstance().add(new SleepBean("wake", "14:11"));
+        SleepControl.getInstance().add(new SleepBean("sleep", "14:12"));
+        SleepControl.getInstance().add(new SleepBean("wake", "14:13"));
+        myThread = new MyThread();
+        myThread.start();
     }
 
     private void initListener() {
@@ -164,18 +177,23 @@ public class MainActivity extends AppCompatActivity implements SleepControl.OnSl
             }
         });
         SleepControl.getInstance().setOnSleepListener(this);
-    }
-
-    @Override
-    public void sleep(SleepBean sleepBean) {
-        switch (sleepBean.getMotionType()) {
-            case "sleep":
+        timeSleep.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isSleep = true;
                 mask.setVisibility(View.VISIBLE);
-                break;
-            case "wake":
+            }
+        });
+        timeWakeUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isSleep = false;
                 mask.setVisibility(View.GONE);
-                break;
-        }
+                synchronized (object) {
+                    object.notify();
+                }
+            }
+        });
     }
 
     @SuppressWarnings("deprecation")
@@ -232,5 +250,50 @@ public class MainActivity extends AppCompatActivity implements SleepControl.OnSl
         }
     }
 
+    @Override
+    public void sleep(SleepBean sleepBean) {
+        switch (sleepBean.getMotionType()) {
+            case "sleep":
+                isSleep = true;
+                mask.setVisibility(View.VISIBLE);
+                Log.d("MyThreadInfo", "开始休眠");
+                break;
+            case "wake":
+                isSleep = false;
+                synchronized (object) {
+                    object.notify();
+                }
+                mask.setVisibility(View.GONE);
+                Log.d("MyThreadInfo", "开始唤醒");
+                break;
+        }
+    }
+
+    /**
+     * 利用SleepControl来控制该线程执行还是休眠
+     * **/
+    private class MyThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            while (true) {
+                synchronized (object) {
+                    if (isSleep) {
+                        try {
+                            object.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                try {
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.d("MyThreadInfo", i++ + "");
+            }
+        }
+    }
 
 }
