@@ -1,20 +1,14 @@
 package example.simpo.sleep;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PowerManager;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
@@ -22,26 +16,30 @@ import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import example.simpo.sleep.netswitch.NetSwitchUtils;
 import example.simpo.sleep.netswitch.NetSignUtils;
+import example.simpo.sleep.netswitch.NetSwitchUtils;
 import example.simpo.sleep.netswitch.WifiConnectUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SleepControl.OnSleepListener {
 
     private Handler handler;
     private int time = 0;
     private boolean set = false;
-    private Button imei, connectWifi, openWifi, closeWifi, strongSign,openGps, closeGps;
+    private Button imei, connectWifi, openWifi, closeWifi, strongSign, openGps, closeGps;
     private EditText wifiName, wifiPwd, wifiType;
     public TelephonyManager mTelephonyManager;
     public PhoneStatListener mListener;
+    private View mask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //设置系统永不休眠
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
         initView();
         initData();
@@ -59,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         imei = findViewById(R.id.imei);
         openGps = findViewById(R.id.open_gps);
         closeGps = findViewById(R.id.close_gps);
+        mask = findViewById(R.id.mask);
         imei.setText("IMEI:  " + PhoneControl.getInstance(MainActivity.this).getIMEI(this));
     }
 
@@ -107,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
         mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         //开始监听
         mListener = new PhoneStatListener();
+        //添加定时黑屏和亮屏数据，使用的前提是保证引应用永不休眠
+        SleepControl.getInstance().add(new SleepBean("sleep", "10:10"));
+        SleepControl.getInstance().add(new SleepBean("wake", "10:11"));
     }
 
     private void initListener() {
@@ -161,6 +163,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        SleepControl.getInstance().setOnSleepListener(this);
+    }
+
+    @Override
+    public void sleep(SleepBean sleepBean) {
+        switch (sleepBean.getMotionType()) {
+            case "sleep":
+                mask.setVisibility(View.VISIBLE);
+                break;
+            case "wake":
+                mask.setVisibility(View.GONE);
+                break;
+        }
     }
 
     @SuppressWarnings("deprecation")

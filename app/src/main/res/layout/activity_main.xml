@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,124 +7,139 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/sleep"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="5秒后休眠，2小时后唤醒"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/imei"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="IMEI"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-
-        <Button
-            android:id="@+id/open_g"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="开启4G" />
-
-        <Button
-            android:id="@+id/close_g"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="关闭4G" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/wifi_name"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:hint="wifi名称"
-            android:text="simpo04-south"
-            android:textSize="14sp" />
-
-        <EditText
-            android:id="@+id/wifi_pwd"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:hint="wifi密码"
-            android:text="hao88888"
-            android:textSize="14sp" />
-
-        <EditText
-            android:id="@+id/wifi_type"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:hint="加密类型"
-            android:text="1" />
-
-    </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <Button
-            android:id="@+id/open_wifi"
+            android:id="@+id/sleep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="打开wifi" />
+            android:text="5秒后休眠，2小时后唤醒"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/close_wifi"
+            android:id="@+id/imei"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="关闭wifi" />
+            android:text="IMEI"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <Button
+                android:id="@+id/open_g"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="开启4G" />
+
+            <Button
+                android:id="@+id/close_g"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="关闭4G" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/wifi_name"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:hint="wifi名称"
+                android:text="simpo04-south"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/wifi_pwd"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:hint="wifi密码"
+                android:text="hao88888"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/wifi_type"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:hint="加密类型"
+                android:text="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/open_wifi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="打开wifi" />
+
+            <Button
+                android:id="@+id/close_wifi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="关闭wifi" />
+
+            <Button
+                android:id="@+id/connect_wifi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="连接wifi" />
+
+        </LinearLayout>
 
         <Button
-            android:id="@+id/connect_wifi"
+            android:id="@+id/strong_sign"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="连接wifi" />
+            android:text="信号强度" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/open_gps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取定位" />
+
+            <Button
+                android:id="@+id/close_gps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="当前位置" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/strong_sign"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="信号强度" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/open_gps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="获取定位" />
-
-        <Button
-            android:id="@+id/close_gps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="当前位置" />
-
-    </LinearLayout>
+    <View
+        android:id="@+id/mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:visibility="gone"/>
 
 
-</LinearLayout>
+</RelativeLayout>
